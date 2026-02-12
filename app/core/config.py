@@ -16,5 +16,11 @@ class Settings(BaseSettings):
     # Frontend
     FRONTEND_URL: str = "http://localhost:5173"
 
+    # OpenRouter
+    OPENROUTER_API_KEY: str = ""
+    OPENROUTER_BASE_URL: str = "https://openrouter.ai/api/v1"
+    OPENROUTER_DEFAULT_MODEL: str = "anthropic/claude-sonnet-4-20250514"
+    OPENROUTER_MAX_RETRIES: int = 3
+
 
 settings = Settings()
