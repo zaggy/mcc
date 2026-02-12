@@ -34,9 +34,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
       setTokens(data.access_token, data.refresh_token);
       set({ isLoggedIn: true, isLoading: false });
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const axiosErr = err as { response?: { data?: { error?: { message?: string } } } };
       const message =
-        err.response?.data?.error?.message || "Login failed. Please try again.";
+        axiosErr.response?.data?.error?.message || "Login failed. Please try again.";
       set({ isLoading: false, error: message });
     }
   },
@@ -58,9 +59,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         requires2fa: false,
         tempToken: null,
       });
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const axiosErr = err as { response?: { data?: { error?: { message?: string } } } };
       const message =
-        err.response?.data?.error?.message || "Invalid 2FA code. Please try again.";
+        axiosErr.response?.data?.error?.message || "Invalid 2FA code. Please try again.";
       set({ isLoading: false, error: message });
     }
   },
