@@ -10,6 +10,7 @@ from app.core.security import (
     create_access_token,
     create_refresh_token,
     decode_token,
+    hash_password,
     verify_password,
     verify_totp,
 )
@@ -25,6 +26,10 @@ from app.models.auth import (
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
+# Pre-computed dummy hash so invalid-username attempts still run argon2 verify
+# (prevents timing side-channel for username enumeration)
+_DUMMY_HASH = hash_password("dummy")
+
 
 @router.post("/login")
 async def login(
@@ -34,7 +39,8 @@ async def login(
     result = await db.execute(select(User).where(User.username == body.username))
     user = result.scalar_one_or_none()
 
-    if user is None or not verify_password(body.password, user.password_hash):
+    password_hash = user.password_hash if user is not None else _DUMMY_HASH
+    if not verify_password(body.password, password_hash) or user is None:
         raise MCCError(
             code="INVALID_CREDENTIALS",
             message="Invalid username or password",

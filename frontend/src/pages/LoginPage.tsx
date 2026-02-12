@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/stores/auth-store";
 import {
@@ -23,10 +23,11 @@ export default function LoginPage() {
   const [twoFactorCode, setTwoFactorCode] = useState("");
 
   // Redirect if already logged in after successful auth
-  if (isLoggedIn) {
-    navigate("/", { replace: true });
-    return null;
-  }
+  useEffect(() => {
+    if (isLoggedIn) {
+      navigate("/", { replace: true });
+    }
+  }, [isLoggedIn, navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
