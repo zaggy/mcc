@@ -1,0 +1,16 @@
+{$SITE_ADDRESS:localhost} {
+	# API and WebSocket → backend
+	handle /api/* {
+		reverse_proxy backend:8000
+	}
+	handle /ws/* {
+		reverse_proxy backend:8000
+	}
+
+	# Frontend SPA — serve static files, fallback to index.html
+	handle {
+		root * /srv
+		try_files {path} /index.html
+		file_server
+	}
+}
