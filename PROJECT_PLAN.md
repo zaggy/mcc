@@ -23,7 +23,7 @@ Merge (by Orchestrator) → CI/CD → Production
 
 ## Phase 1: Architecture & Design
 
-### Task 1.1: Technical Requirements Document
+### Task 1.1: Technical Requirements Document ✅
 **Deliverable:** `/docs/TECH_SPECS.md`
 - Define system architecture (microservices vs monolith)
 - Database schema design
@@ -33,7 +33,7 @@ Merge (by Orchestrator) → CI/CD → Production
 - OpenRouter API integration strategy
 - Real-time updates strategy (WebSockets vs polling)
 
-### Task 1.2: Database Design
+### Task 1.2: Database Design ✅
 **Deliverable:** `/docs/DB_SCHEMA.md` + migration files
 Tables:
 - `users` (authentication)
@@ -48,7 +48,7 @@ Tables:
 - `budget_limits` (spending limits configuration)
 - `notifications` (alert history)
 
-### Task 1.3: UI/UX Wireframes
+### Task 1.3: UI/UX Wireframes ⏳
 **Deliverable:** `/docs/UI_WIREFRAMES.md` + Figma links or ASCII diagrams
 - Dashboard layout
 - Project view
@@ -57,7 +57,7 @@ Tables:
 - Budget/analytics dashboard
 - Settings panels
 
-### Task 1.4: API Specification
+### Task 1.4: API Specification ✅
 **Deliverable:** `/docs/API_SPEC.md`
 - REST API endpoints
 - WebSocket events
@@ -68,9 +68,10 @@ Tables:
 
 ### Task 2.1: Project Bootstrap
 **Deliverable:** Working development environment
-- Initialize Python/FastAPI or Node.js/Express project
-- Set up Docker and docker-compose
-- Configure linting, formatting, pre-commit hooks
+- Initialize Python/FastAPI project
+- Set up Docker and docker-compose (PostgreSQL + Redis for production)
+- MVP: SQLite + FastAPI BackgroundTasks (no Docker required for local dev)
+- Configure linting (ruff), formatting (ruff format), type checking (mypy)
 - Create `.env.example` with all required variables
 - Set up CI/CD for the MCC project itself
 
@@ -311,7 +312,7 @@ Each agent needs:
 - **Database:** PostgreSQL 15+ (or SQLite for MVP)
 - **ORM:** SQLAlchemy 2.0 + Alembic
 - **Auth:** JWT with python-jose
-- **Tasks:** Celery + Redis (for background jobs)
+- **Tasks:** FastAPI BackgroundTasks (MVP) / Celery + Redis (production)
 - **WebSocket:** native FastAPI + python-socketio
 
 ### Frontend
@@ -345,7 +346,7 @@ agents:
 
 -- Token tracking (granular)
 token_usage:
-  - id, timestamp
+  - id, timestamp, usage_date
   - agent_id, conversation_id, message_id
   - model_used
   - tokens_in, tokens_out
@@ -373,10 +374,8 @@ conversations:
 - [ ] System can create and complete a full workflow from issue to merged PR
 - [ ] Token tracking is accurate to within 1% of OpenRouter billing
 - [ ] Budget limits effectively prevent overspending
-- [ ] Average time from issue to PR: < 30 minutes for simple tasks
 - [ ] All agent types can communicate and hand off work seamlessly
 - [ ] UI provides clear visibility into all ongoing work
-- [ ] 99.9% uptime for core functionality
 
 ## Risk Mitigation
 
@@ -390,7 +389,7 @@ conversations:
 
 For first usable version:
 - Single project support
-- SQLite database
+- SQLite database (no Redis/Celery — use FastAPI BackgroundTasks + asyncio)
 - 1 of each agent type
 - Basic token tracking
 - Simple budget warnings (no hard stops yet)
