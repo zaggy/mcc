@@ -116,20 +116,24 @@ export default function ProjectPage() {
       return;
     }
 
+    const controller = new AbortController();
+
     async function fetchMessages() {
       try {
         const { data } = await api.get<PaginatedMessages>(
-          `/projects/${projectId}/conversations/${activeConversationId}/messages`
+          `/projects/${projectId}/conversations/${activeConversationId}/messages`,
+          { signal: controller.signal }
         );
         setMessages([...data.messages].reverse());
         setHasMore(data.has_more);
         setNextCursor(data.next_cursor);
       } catch {
-        // handled silently
+        // handled silently (includes aborted requests)
       }
     }
 
     fetchMessages();
+    return () => controller.abort();
   }, [projectId, activeConversationId]);
 
   const handleLoadMore = useCallback(async () => {
