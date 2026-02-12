@@ -6,6 +6,7 @@ from decimal import Decimal
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.security import hash_password
 from app.db.models import Agent, BudgetLimit, Project, User
 from app.db.session import async_session, engine
 
@@ -17,11 +18,11 @@ async def seed_database(session: AsyncSession) -> None:
         print("Seed data already exists, skipping.")
         return
 
-    # Admin user (password will be set properly in PR #4 with argon2)
+    # Admin user
     admin = User(
         username="admin",
         email="admin@mcc.local",
-        password_hash="NOT_SET_YET",
+        password_hash=hash_password("changeme123!"),
         is_admin=True,
         is_active=True,
     )
