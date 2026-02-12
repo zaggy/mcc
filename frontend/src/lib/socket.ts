@@ -8,7 +8,7 @@ export function connectSocket(): Socket {
 
   socket = io({
     path: "/ws/socket.io",
-    auth: { token: getAccessToken() },
+    auth: (cb) => cb({ token: getAccessToken() }),
     transports: ["websocket"],
   });
 

@@ -28,6 +28,7 @@ export default function ProjectPage() {
   const [loading, setLoading] = useState(true);
 
   const prevConvoRef = useRef<string | null>(null);
+  const activeIdRef = useRef<string | null>(null);
 
   // Fetch project, agents, conversations on mount
   useEffect(() => {
@@ -58,30 +59,25 @@ export default function ProjectPage() {
     const socket = connectSocket();
 
     socket.on("message", (data: { id: string; conversation_id: string; author_type: string; agent_id: string | null; content: string; created_at: string }) => {
-      // Only append if it belongs to the active conversation
-      setActiveConversationId((currentId) => {
-        if (data.conversation_id === currentId) {
-          setMessages((prev) => {
-            if (prev.some((m) => m.id === data.id)) return prev;
-            return [
-              ...prev,
-              {
-                id: data.id,
-                conversation_id: data.conversation_id,
-                author_type: data.author_type as "user" | "agent",
-                user_id: null,
-                agent_id: data.agent_id,
-                content: data.content,
-                tokens_in: 0,
-                tokens_out: 0,
-                cost_usd: "0",
-                model_used: null,
-                created_at: data.created_at,
-              },
-            ];
-          });
-        }
-        return currentId;
+      if (data.conversation_id !== activeIdRef.current) return;
+      setMessages((prev) => {
+        if (prev.some((m) => m.id === data.id)) return prev;
+        return [
+          ...prev,
+          {
+            id: data.id,
+            conversation_id: data.conversation_id,
+            author_type: data.author_type as "user" | "agent",
+            user_id: null,
+            agent_id: data.agent_id,
+            content: data.content,
+            tokens_in: 0,
+            tokens_out: 0,
+            cost_usd: "0",
+            model_used: null,
+            created_at: data.created_at,
+          },
+        ];
       });
     });
 
@@ -108,6 +104,7 @@ export default function ProjectPage() {
     }
 
     prevConvoRef.current = activeConversationId;
+    activeIdRef.current = activeConversationId;
   }, [activeConversationId]);
 
   // Fetch messages when active conversation changes
@@ -124,7 +121,7 @@ export default function ProjectPage() {
         const { data } = await api.get<PaginatedMessages>(
           `/projects/${projectId}/conversations/${activeConversationId}/messages`
         );
-        setMessages(data.messages.reverse());
+        setMessages([...data.messages].reverse());
         setHasMore(data.has_more);
         setNextCursor(data.next_cursor);
       } catch {
@@ -143,7 +140,7 @@ export default function ProjectPage() {
         `/projects/${projectId}/conversations/${activeConversationId}/messages`,
         { params: { before: nextCursor, limit: 50 } }
       );
-      setMessages((prev) => [...data.messages.reverse(), ...prev]);
+      setMessages((prev) => [...[...data.messages].reverse(), ...prev]);
       setHasMore(data.has_more);
       setNextCursor(data.next_cursor);
     } catch {
