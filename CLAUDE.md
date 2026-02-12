@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Mission Control Center (MCC) is a multi-agent AI software development platform that orchestrates a virtual software company. It manages specialized AI agents (Architect, Coders, Tester, Code Reviewer) through a structured workflow: GitHub Issue → Architect Planning → Coder Implementation → Tester Validation + Code Review → Merge → CI/CD.
 
-**Status:** Phase 2 (Core Infrastructure) in progress.
+**Status:** Phase 2 complete. Phase 3 (Agent Core System) next.
 
 ## Tech Stack
 
@@ -28,6 +28,8 @@ Mission Control Center (MCC) is a multi-agent AI software development platform t
 - **Test:** `uv run pytest tests/ -v --tb=short`
 - **Migrate DB:** `uv run alembic upgrade head`
 - **Start Postgres:** `docker compose up postgres -d`
+- **Deploy:** `docker compose -f docker-compose.prod.yml --env-file .env.production up -d --build`
+- **Rebuild frontend:** `cd frontend && npm run build`
 
 ## Architecture
 
