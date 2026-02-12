@@ -78,7 +78,7 @@ async def verify_2fa(
     result = await db.execute(select(User).where(User.id == user_id))
     user = result.scalar_one_or_none()
 
-    if user is None or not user.totp_secret:
+    if user is None or not user.totp_secret or not user.is_active:
         raise MCCError(code="INVALID_TOKEN", message="User not found", status_code=401)
 
     if not verify_totp(user.totp_secret, body.code):

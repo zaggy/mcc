@@ -20,5 +20,13 @@ export function clearTokens(): void {
 }
 
 export function isAuthenticated(): boolean {
-  return getAccessToken() !== null;
+  const token = getAccessToken();
+  if (!token) return false;
+
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return typeof payload.exp === "number" && payload.exp * 1000 > Date.now();
+  } catch {
+    return false;
+  }
 }
