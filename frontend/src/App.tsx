@@ -5,6 +5,7 @@ import AuthLayout from "@/components/layout/AuthLayout";
 import MainLayout from "@/components/layout/MainLayout";
 import DashboardPage from "@/pages/DashboardPage";
 import LoginPage from "@/pages/LoginPage";
+import ProjectsPage from "@/pages/ProjectsPage";
 import ProjectPage from "@/pages/ProjectPage";
 import BudgetPage from "@/pages/BudgetPage";
 import SettingsPage from "@/pages/SettingsPage";
@@ -29,6 +30,16 @@ export default function App() {
           <ProtectedRoute>
             <MainLayout>
               <DashboardPage />
+            </MainLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/projects"
+        element={
+          <ProtectedRoute>
+            <MainLayout>
+              <ProjectsPage />
             </MainLayout>
           </ProtectedRoute>
         }
