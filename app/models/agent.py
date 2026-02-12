@@ -22,3 +22,10 @@ class AgentCreate(BaseModel):
     model_config_json: dict = {}
     system_prompt: str | None = None
     rules_file_path: str | None = None
+
+
+class AgentUpdate(BaseModel):
+    name: str | None = None
+    model_config_json: dict | None = None
+    system_prompt: str | None = None
+    is_active: bool | None = None

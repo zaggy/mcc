@@ -1,6 +1,6 @@
 """FastAPI dependencies for authentication and authorization."""
 
-from fastapi import Depends
+from fastapi import Depends, Request
 from fastapi.security import OAuth2PasswordBearer
 from jwt import InvalidTokenError
 from sqlalchemy import select
@@ -10,6 +10,7 @@ from app.core.exceptions import MCCError
 from app.core.security import decode_token
 from app.db.models import User
 from app.db.session import get_db
+from app.services.openrouter import OpenRouterClient
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
 
@@ -50,3 +51,7 @@ async def get_current_admin_user(
     if not user.is_admin:
         raise MCCError(code="FORBIDDEN", message="Admin access required", status_code=403)
     return user
+
+
+def get_openrouter(request: Request) -> OpenRouterClient:
+    return request.app.state.openrouter

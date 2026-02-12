@@ -20,9 +20,14 @@ async def _auto_seed() -> None:
 
 
 @asynccontextmanager
-async def lifespan(application: FastAPI):  # noqa: ARG001
+async def lifespan(application: FastAPI):
+    from app.services.openrouter import OpenRouterClient
+
     await _auto_seed()
+    client = OpenRouterClient()
+    application.state.openrouter = client
     yield
+    await client.close()
 
 
 class RequestIDMiddleware(BaseHTTPMiddleware):
@@ -54,3 +59,8 @@ app.add_middleware(
 app.add_exception_handler(MCCError, mcc_exception_handler)  # type: ignore[arg-type]
 
 app.include_router(api_router)
+
+# Mount Socket.io at /ws
+from app.api.websocket import sio_app  # noqa: E402
+
+app.mount("/ws", sio_app)
