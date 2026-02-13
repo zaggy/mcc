@@ -21,13 +21,17 @@ async def _auto_seed() -> None:
 
 @asynccontextmanager
 async def lifespan(application: FastAPI):
+    from app.services.github_client import GitHubClient
     from app.services.openrouter import OpenRouterClient
 
     await _auto_seed()
-    client = OpenRouterClient()
-    application.state.openrouter = client
+    openrouter_client = OpenRouterClient()
+    github_client = GitHubClient()
+    application.state.openrouter = openrouter_client
+    application.state.github = github_client
     yield
-    await client.close()
+    await openrouter_client.close()
+    await github_client.close()
 
 
 class RequestIDMiddleware(BaseHTTPMiddleware):
