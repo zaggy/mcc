@@ -120,6 +120,8 @@ async def list_issues(
     query = select(GithubIssue).where(GithubIssue.project_id == project_id)
     if state:
         query = query.where(GithubIssue.state == state)
+    if label:
+        query = query.where(GithubIssue.labels.contains([label]))
     query = query.order_by(GithubIssue.number.desc())
     result = await db.execute(query)
     return list(result.scalars().all())

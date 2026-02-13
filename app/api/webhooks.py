@@ -4,7 +4,6 @@ import logging
 
 from fastapi import APIRouter, BackgroundTasks, Request
 
-from app.core.exceptions import MCCError
 from app.db.session import async_session
 from app.models.github import WebhookResponse
 from app.services import webhook_service
@@ -29,11 +28,8 @@ async def receive_github_webhook(
     event_type = request.headers.get("X-GitHub-Event", "ping")
 
     if not webhook_service.verify_github_signature(body, signature):
-        raise MCCError(
-            code="INVALID_SIGNATURE",
-            message="Invalid webhook signature",
-            status_code=401,
-        )
+        logger.warning("Invalid GitHub webhook signature")
+        return WebhookResponse(status="ignored")
 
     # Ping event — just acknowledge
     if event_type == "ping":
