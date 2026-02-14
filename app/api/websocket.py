@@ -67,7 +67,7 @@ async def join_conversation(sid: str, data: dict):
     if not conversation_id:
         return
     room = str(conversation_id)
-    sio.enter_room(sid, room)
+    await sio.enter_room(sid, room)
     logger.info("sid=%s joined room %s", sid, room)
     await sio.emit("joined", {"conversation_id": conversation_id}, room=sid)
 
@@ -79,7 +79,7 @@ async def leave_conversation(sid: str, data: dict):
     if not conversation_id:
         return
     room = str(conversation_id)
-    sio.leave_room(sid, room)
+    await sio.leave_room(sid, room)
     logger.info("sid=%s left room %s", sid, room)
 
 
