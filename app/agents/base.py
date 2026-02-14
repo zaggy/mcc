@@ -105,6 +105,14 @@ class BaseAgent(ABC):
 
         # 3. Build messages array
         system_prompt = self._get_system_prompt()
+
+        # 3a. Inject agent memory context into system prompt
+        from app.services.memory_service import build_memory_context
+
+        memory_context = await build_memory_context(db, self.agent_id, self.project_id)
+        if memory_context:
+            system_prompt += "\n\n" + memory_context
+
         messages: list[dict[str, str]] = [{"role": "system", "content": system_prompt}]
 
         for msg in history:

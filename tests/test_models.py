@@ -26,7 +26,7 @@ TEST_DB_URL = f"{_base}/mcc_test"
 # Ensure test DB exists (runs once at import time)
 _sync_base = settings.DATABASE_URL.replace("postgresql+asyncpg://", "")
 _host_part = _sync_base.rsplit("/", 1)[0]
-_conn = psycopg2.connect(f"postgresql://{_host_part}/postgres")
+_conn = psycopg2.connect(f"postgresql://{_host_part}/mcc")
 _conn.autocommit = True
 _cur = _conn.cursor()
 _cur.execute("SELECT 1 FROM pg_database WHERE datname = 'mcc_test'")

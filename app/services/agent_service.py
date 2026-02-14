@@ -80,10 +80,13 @@ async def reset_agent(
     project_id: uuid.UUID,
     agent_id: uuid.UUID,
 ) -> Agent:
-    """Reset agent to default state (clear custom prompt, set active)."""
+    """Reset agent to default state (clear custom prompt, set active, clear memories)."""
+    from app.services.memory_service import delete_agent_memories
+
     agent = await get_agent(db, project_id, agent_id)
     agent.system_prompt = None
     agent.is_active = True
+    await delete_agent_memories(db, agent_id)
     await db.commit()
     await db.refresh(agent)
     return agent
