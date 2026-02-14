@@ -22,5 +22,10 @@ class Settings(BaseSettings):
     OPENROUTER_DEFAULT_MODEL: str = "anthropic/claude-sonnet-4-20250514"
     OPENROUTER_MAX_RETRIES: int = 3
 
+    # GitHub
+    GITHUB_TOKEN: str = ""
+    GITHUB_API_BASE_URL: str = "https://api.github.com"
+    GITHUB_WEBHOOK_SECRET: str = ""
+
 
 settings = Settings()

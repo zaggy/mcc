@@ -10,6 +10,7 @@ from app.core.exceptions import MCCError
 from app.core.security import decode_token
 from app.db.models import User
 from app.db.session import get_db
+from app.services.github_client import GitHubClient
 from app.services.openrouter import OpenRouterClient
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
@@ -55,3 +56,7 @@ async def get_current_admin_user(
 
 def get_openrouter(request: Request) -> OpenRouterClient:
     return request.app.state.openrouter
+
+
+def get_github(request: Request) -> GitHubClient:
+    return request.app.state.github
