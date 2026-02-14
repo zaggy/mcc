@@ -52,9 +52,11 @@ export default function AgentConfigDialog({
   );
   const [isActive, setIsActive] = useState(agent.is_active);
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   async function handleSave() {
     setSaving(true);
+    setError(null);
     try {
       const { data } = await api.patch<Agent>(
         `/projects/${projectId}/agents/${agent.id}`,
@@ -71,7 +73,7 @@ export default function AgentConfigDialog({
       onSaved(data);
       onOpenChange(false);
     } catch {
-      // handled silently
+      setError("Failed to save agent configuration. Please try again.");
     } finally {
       setSaving(false);
     }
@@ -144,6 +146,10 @@ export default function AgentConfigDialog({
             <Label htmlFor="is-active">Active</Label>
           </div>
         </div>
+
+        {error && (
+          <p className="text-sm text-destructive">{error}</p>
+        )}
 
         <DialogFooter>
           <Button
