@@ -13,6 +13,7 @@ export interface Agent {
   name: string;
   type: string;
   model_config_json: Record<string, unknown>;
+  system_prompt: string | null;
   is_active: boolean;
   project_id: string | null;
   created_at: string;

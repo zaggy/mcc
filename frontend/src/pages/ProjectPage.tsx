@@ -170,6 +170,10 @@ export default function ProjectPage() {
     setAgents((prev) => [...prev, agent]);
   }, []);
 
+  const handleAgentUpdated = useCallback((agent: Agent) => {
+    setAgents((prev) => prev.map((a) => (a.id === agent.id ? agent : a)));
+  }, []);
+
   if (loading) {
     return (
       <div className="flex h-full items-center justify-center">
@@ -213,6 +217,7 @@ export default function ProjectPage() {
         project={project}
         agents={agents}
         onAgentCreated={handleAgentCreated}
+        onAgentUpdated={handleAgentUpdated}
       />
     </div>
   );

@@ -9,6 +9,7 @@ class AgentRead(BaseModel):
     name: str
     type: str
     model_config_json: dict
+    system_prompt: str | None
     is_active: bool
     project_id: uuid.UUID | None
     created_at: datetime
