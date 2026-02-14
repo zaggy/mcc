@@ -59,7 +59,7 @@ async def get_memory(
     _user: User = Depends(get_current_user),
 ):
     memory = await memory_service.get_memory(db, memory_id)
-    if not memory or memory.agent_id != agent_id:
+    if not memory or memory.agent_id != agent_id or memory.project_id != project_id:
         raise MCCError(code="MEMORY_NOT_FOUND", message="Memory not found", status_code=404)
     return memory
 
@@ -73,9 +73,9 @@ async def update_memory(
     db: AsyncSession = Depends(get_db),
     _user: User = Depends(get_current_user),
 ):
-    # Verify the memory belongs to this agent
+    # Verify the memory belongs to this agent and project
     existing = await memory_service.get_memory(db, memory_id)
-    if not existing or existing.agent_id != agent_id:
+    if not existing or existing.agent_id != agent_id or existing.project_id != project_id:
         raise MCCError(code="MEMORY_NOT_FOUND", message="Memory not found", status_code=404)
 
     memory = await memory_service.update_memory(db, memory_id, data)
@@ -92,9 +92,9 @@ async def delete_memory(
     db: AsyncSession = Depends(get_db),
     _user: User = Depends(get_current_user),
 ):
-    # Verify the memory belongs to this agent
+    # Verify the memory belongs to this agent and project
     existing = await memory_service.get_memory(db, memory_id)
-    if not existing or existing.agent_id != agent_id:
+    if not existing or existing.agent_id != agent_id or existing.project_id != project_id:
         raise MCCError(code="MEMORY_NOT_FOUND", message="Memory not found", status_code=404)
 
     await memory_service.delete_memory(db, memory_id)
