@@ -11,6 +11,7 @@ import {
 import { Bot, Plus, X, Github } from "lucide-react";
 import type { Project, Agent } from "@/types";
 import api from "@/lib/api";
+import AgentConfigDialog from "./AgentConfigDialog";
 
 const agentTypeColors: Record<string, string> = {
   orchestrator: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300",
@@ -24,17 +25,20 @@ interface InfoPanelProps {
   project: Project;
   agents: Agent[];
   onAgentCreated: (agent: Agent) => void;
+  onAgentUpdated: (agent: Agent) => void;
 }
 
 export default function InfoPanel({
   project,
   agents,
   onAgentCreated,
+  onAgentUpdated,
 }: InfoPanelProps) {
   const [showForm, setShowForm] = useState(false);
   const [name, setName] = useState("");
   const [type, setType] = useState("coder");
   const [creating, setCreating] = useState(false);
+  const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault();
@@ -124,7 +128,8 @@ export default function InfoPanel({
           {agents.map((agent) => (
             <div
               key={agent.id}
-              className="flex items-center gap-2 rounded-md border p-2"
+              className="flex cursor-pointer items-center gap-2 rounded-md border p-2 transition-colors hover:bg-muted/50"
+              onClick={() => setSelectedAgent(agent)}
             >
               <Bot className="h-4 w-4 text-muted-foreground" />
               <div className="flex-1 min-w-0">
@@ -145,6 +150,21 @@ export default function InfoPanel({
           ))}
         </CardContent>
       </Card>
+
+      {selectedAgent && (
+        <AgentConfigDialog
+          agent={selectedAgent}
+          projectId={project.id}
+          open={!!selectedAgent}
+          onOpenChange={(open) => {
+            if (!open) setSelectedAgent(null);
+          }}
+          onSaved={(updated) => {
+            onAgentUpdated(updated);
+            setSelectedAgent(null);
+          }}
+        />
+      )}
     </div>
   );
 }
