@@ -117,8 +117,10 @@ async def send_message(
     # Save user message
     user_msg = await conversation_service.create_message(db, conversation_id, user.id, data.content)
 
-    # Get participating agents and dispatch background tasks
-    agent_ids = await conversation_service.get_conversation_agent_ids(db, conversation_id)
+    # Get dispatch targets (respects @mentions, falls back to all participants)
+    from app.services.dispatch_service import resolve_dispatch_targets
+
+    agent_ids = await resolve_dispatch_targets(db, conversation_id, data.content)
     for agent_id in agent_ids:
         background_tasks.add_task(
             _process_agent_response,
@@ -138,6 +140,7 @@ async def _process_agent_response(
     """Background task: have an agent generate a response."""
     from app.agents.registry import create_agent
     from app.db.models import Agent
+    from app.services.agent_status import emit_agent_status
 
     try:
         async with async_session() as db:
@@ -145,6 +148,9 @@ async def _process_agent_response(
             if not agent_record or not agent_record.is_active:
                 logger.warning("Agent %s not found or inactive, skipping", agent_id)
                 return
+
+            # Emit "thinking" status
+            await emit_agent_status(conversation_id, agent_id, "thinking")
 
             agent = create_agent(agent_record, openrouter)
             result = await agent.process_message(db, conversation_id)
@@ -170,5 +176,11 @@ async def _process_agent_response(
                 except Exception:
                     logger.debug("WebSocket emit skipped (not connected)")
 
+            # Emit "idle" status after processing
+            await emit_agent_status(conversation_id, agent_id, "idle")
+
     except Exception:
         logger.exception("Error processing agent %s response", agent_id)
+        await emit_agent_status(
+            conversation_id, agent_id, "error", error_message="Failed to generate response"
+        )
